@@ -1,0 +1,146 @@
+video 23
+
+sintaxis estructura
+1. rutas api: routes/web.php
+2. controles: App/Http/Controllers
+3. visita inicial: resources/views/layouts/plantilla.blade.php
+4. vista general: resources/views/home.blade.php
+5. vistas: resources/views/#carpeta/#vistas.php
+
+
+
+
+
+
+
+CONFIGURACIÓN DOMINIO LOCAL: https://codersfree.com/blog/como-generar-un-dominio-local-en-windows-xampp
+
+estructura del proyecto
+1. web: es el corazon: esta en routes/web.php
+2. controladores: conectan las vistas con el modelo: app/htts/controlles
+3. vistas: es la visual del proyecto: resources/views
+
+como crear controlador desde consola:
+1. nos ubicamos en la carpeta raiz del proyecto 
+2. php artisan make:controller #nombrecontrolador+Controller
+
+como crear migraciones
+1. en la consola. php artisan migrate. este comando va a recorrer todas las migraciones y ejectura la función 06pUGohbexd41TFejpt
+para crear las propias migraciones desde cero: se recomienda utilizar el nombre "create_#nombretabla_table
+1. comando. php artisan make:migration #nombredelamigracion. al ejecutar este comando se crea el archivo en migraciones
+2. abrimos en archivo y especificamos la función up para crear la tabla 
+para revertir los cambio. elimina todo lo del ultimo lote 
+1. comando: php artisan migrate:rollback
+para eliminar y crear nuevamente 
+1. comando: php artisan migrate:fresh: elimina todas las tablas y luego ejecuta el metodo create
+2. otro comando puede ser: php artisan migrate:refresh: este metodo ejecuta todos los metodos down() de las migraciones y luego el metodo create
+
+para agregar una columna
+1.se crea la migración con el siguiente comando php artisan make:migration add_avatar_to_users_table
+2. corremos la migración con el siquiete comando: php artisan migrate
+
+para modificar estructura de algun campo
+1. agregamos la siguiente dependencia al objeto composer.json. se hace a traves de la terminal. puede copiar y pegar composer require doctrine/dbal
+2. se crea una migración php artisan make:migration cambiar_propiedades_to_users_table
+3. en la migración se especfica en la función que se desea cambiar. ejemplo $table->string('name', 50)->change();
+4. se ejecuta el siguiente comando: php artisan migrate
+
+
+
+
+__________________________________________________________________________________________________
+
+MODELOS
+
+
+1. para crear un modelo corremos en la terminal la siguiente sentencia: php artisan make:model Curso
+2. se debe abrir tinker ejecutando el siquiete comando: php artisan tinker
+3. en la terminal indicar que va a utilizar use App\Models\Curso;
+4. $curso = new Curso;
+5. $curso->name = 'Laravel';
+6. $curso->descripcion = 'El mejor framework de PHP';
+7. $curso; 
+8. ya con esto hemos creado el objeto pero no se ha guardado. para guardarlo ejecutamos $curso->save();
+9 si colocamos $curso; nos trae lo que se almaceno
+para modificar algun campo 
+1. $curso->descripcion = "El Mejor framework del mundo";
+2.$curso->save();
+Si deseo que el modelo no guarde por defecto en la tabla, debemos especificar creando en el archivo protected $table = "users";
+
+
+SEEDERS: son para manipular los datos de la base de datos
+para agregar un registro: 
+1. Creamos un seed para cada tabla con el siguiente comando. php artisan make:seeder CursoSeeder
+2. en el archivo database/seeders/CursoSeeders.php colocamos los campos de la base de datos
+public function run()
+    {
+        $curso = new Curso();
+
+        $curso->name = "Laravel";
+        $curso->descripcion = 'El mejor frameork de PHP';
+        $curso->categoria = "Desarrollo Web";
+
+        $curso->save();
+    }
+3. en el archivo database/seeders/DatabaseSeeders.php. hacemos el llamado a CursoSeeder. $this->call(CursoSeeder::class);
+4. por consola colocamos el siguiente comando. php artisan migrate:fresh --seed
+
+
+FACTORIES: sirve para crear contenidos de prueba
+1. para crear un factory ejecutamos en siguiente comando. php artisan make:factory CursoFactory
+2. dentro de la función colocamos los campos y los tipos de datos con las cuales lo queremos llenar
+return [
+            'name'=>$this->faker->sentence(), 
+            'descripcion'=>$this->faker->paragraph(),
+            'categoria'=>$this->faker->randomElement(['Desarrollo Web', 'Diseño Web'])
+        ];
+3. en el archivo database/seeders/CursoSeeders.php en la función colocamos Curso::factory(50)->Create(); (50 es el numero de registros que deseo crear)
+4. ejecuto el siguiente comando. php artisan migrate:fresh --seed
+
+
+GENERARA CONSULTAS
+por tinker.
+
+Regresar todos los elementos de una tabla
+1. ingresamos a tinker con el siguiente comando. php artisan tinker
+2. use App\Models\Curso;
+
+Regresar todos los elementos de una tabla
+1. $cursos = Curso::all();
+
+
+Regresar todos los elementos de una tabla donde categoria sea = 'diseño web'
+1. $cursos = Curso::where('categoria', 'Diseño Web')->get();
+para cambiar el orden
+1. $cursos = Curso::where('categoria', 'Diseño Web')->orderBy('id', 'desc')->get();
+
+
+Regresar el primer registro teniendo en cuenta el orden
+1. $cursos = Curso::where('categoria', 'Diseño Web')->orderBy('id', 'desc')->first();
+
+Regresar solo los campos name y descripcion
+1. $cursos = Curso::select('name', 'descripcion')->get()
+
+Regresar consulta donde el id es mayor a 45
+1. $curso = Curso::where('id', '>', 45)->get();
+
+
+Regresar consulta que el name contenga 'officia '
+$cursos = Curso::where('name', 'like', '% officia %')->get()
+
+
+__________________________________________________________________________________________________
+FORM REQUEST
+para instalar un form REQUEST ingresamos el siguiente comando por consola. php artisan make:request StoreCurso
+
+
+
+
+__________________________________________________________________________________________________
+creación de mail
+se ejecuta el siguiente comando por consola
+php artisan make:mail ContactanosMailable 
+
+
+
+
